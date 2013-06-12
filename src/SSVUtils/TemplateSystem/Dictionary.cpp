@@ -5,6 +5,8 @@
 #include "SSVUtils/TemplateSystem/Dictionary.h"
 #include "SSVUtils/TemplateSystem/Internal/Symbols.h"
 #include "SSVUtils/String/Utils.h"
+#include "SSVUtils/Tokenizer/Token.h"
+#include "SSVUtils/Log/Log.h"
 
 using namespace std;
 using namespace ssvu::TemplateSystem::Internal;
@@ -13,9 +15,25 @@ namespace ssvu
 {
 	namespace TemplateSystem
 	{
-		Dictionary::Dictionary(initializer_list<pair<string, string>> mPairs) { for(const auto& p : mPairs) replacements.insert(p); }
+		Dictionary::Dictionary()
+		{
+			tokenizer.onIsIgnored = [](char mChar){ return iscntrl(mChar) || isspace(mChar); };
+			tokenizer.onMatchType = [](const string& mValue){ return Internal::matchTokenType(mValue); };
 
-		string Dictionary::getExpanded(string mString) const
+			TokenizerRule symbolRule, restRule;
+			symbolRule.onIsInitial = [](char mChar){ return Internal::isInitialChar(mChar); };
+			symbolRule.onIsValid = [](char mChar){ return Internal::isValidChar(mChar); };
+			symbolRule.onIsKeyword = [](const vector<char> mCurrentToken){ return Internal::isKeyword(mCurrentToken); };
+
+			restRule.onIsInitial = [](char mChar){ return !Internal::isValidChar(mChar); };
+			restRule.onIsValid = [](char mChar){ return !Internal::isValidChar(mChar); };
+
+			tokenizer.addRule(symbolRule);
+			tokenizer.addRule(restRule);
+		}
+		Dictionary::Dictionary(initializer_list<pair<string, string>> mPairs) : Dictionary() { for(const auto& p : mPairs) replacements.insert(p); }
+
+		void Dictionary::expandSections(string& mString) const
 		{
 			for(const auto& p : sectionDictionaries)
 			{
@@ -28,12 +46,26 @@ namespace ssvu
 				const string innerSection{mString.substr(innerSectionStartIndex, innerSectionEndIndex - innerSectionStartIndex)};
 				string innerSectionResult{""};
 
-				for(auto d : p.second) innerSectionResult += d.getExpanded(innerSection);
+				for(const auto& d : p.second) innerSectionResult += d.getExpanded(innerSection);
 
 				mString.replace(outerSectionStartIndex, outerSectionEndIndex - outerSectionStartIndex, innerSectionResult);
 			}
-
+		}
+		void Dictionary::expandReplacements(string& mString) const
+		{
 			for(const auto& p : replacements) replaceAll(mString, getKey(p.first), p.second);
+		}
+		void Dictionary::cleanUpUnexpanded(string& mString) const
+		{
+			vector<Token> tokens{tokenizer.tokenize("{{a[[sdga{{15dgaa{{1{")};
+			for(auto& t : tokens) log(t.getValue(), t.getType());
+		}
+
+		string Dictionary::getExpanded(string mString) const
+		{
+			expandSections(mString);
+			expandReplacements(mString);
+			cleanUpUnexpanded(mString);
 
 			// TODO: cleanup unexpanded sections/replacements?
 			// TODO: newline stripping options?

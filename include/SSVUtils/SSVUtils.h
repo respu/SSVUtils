@@ -37,6 +37,10 @@
 // TemplateSystem
 #include "SSVUtils/TemplateSystem/Dictionary.h"
 
+// Tokenizer
+#include "SSVUtils/Tokenizer/Token.h"
+#include "SSVUtils/Tokenizer/Tokenizer.h"
+
 // TimelineManager
 #include "SSVUtils/Timeline/TimelineManager.h"
 

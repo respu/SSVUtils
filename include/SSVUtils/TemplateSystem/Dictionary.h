@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include "SSVUtils/Tokenizer/Tokenizer.h"
 
 namespace ssvu
 {
@@ -23,8 +24,13 @@ namespace ssvu
 		class Dictionary
 		{
 			private:
+				Tokenizer tokenizer;
 				std::map<std::string, std::string> replacements; /*!< Simple key -> string replacements. */
 				std::map<std::string, std::vector<Dictionary>> sectionDictionaries; /*!< Key -> subdictionary section replacements. */
+
+				void expandSections(std::string& mString) const;
+				void expandReplacements(std::string& mString) const;
+				void cleanUpUnexpanded(std::string& mString) const;
 
 			public:
 				/*!
@@ -34,7 +40,7 @@ namespace ssvu
 				 * Initializes an empty Dictionary.
 				 *
 				 */
-				Dictionary() = default;
+				Dictionary();
 
 				/*!
 				 *

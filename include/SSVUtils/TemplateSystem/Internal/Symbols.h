@@ -6,6 +6,7 @@
 #define SSVU_TEMPLATESYSTEM_INTERNAL_SYMBOLS
 
 #include <string>
+#include <vector>
 
 namespace ssvu
 {
@@ -16,6 +17,10 @@ namespace ssvu
 			std::string getKey(const std::string& mString);
 			std::string getSectionStart(const std::string& mString);
 			std::string getSectionEnd(const std::string& mString);
+			std::string matchTokenType(const std::string& mValue);
+			bool isKeyword(const std::vector<char>& mCurrentToken);
+			bool isInitialChar(char mChar);
+			bool isValidChar(char mChar);
 		}
 	}
 }
