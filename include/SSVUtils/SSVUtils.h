@@ -34,12 +34,12 @@
 // MemoryManager
 #include "SSVUtils/MemoryManager/MemoryManager.h"
 
-// TemplateSystem
-#include "SSVUtils/TemplateSystem/Dictionary.h"
-
 // Tokenizer
 #include "SSVUtils/Tokenizer/Token.h"
 #include "SSVUtils/Tokenizer/Tokenizer.h"
+
+// TemplateSystem
+#include "SSVUtils/TemplateSystem/Dictionary.h"
 
 // TimelineManager
 #include "SSVUtils/Timeline/TimelineManager.h"

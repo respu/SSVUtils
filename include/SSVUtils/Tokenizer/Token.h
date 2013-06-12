@@ -9,15 +9,16 @@
 
 namespace ssvu
 {
-	class Token
+	template<typename T> class Token
 	{
 		private:
-			std::string type, value;
+			T type;
+			std::string value;
 
 		public:
-			Token(const std::string& mType, const std::string& mValue);
-			std::string getType() const;
-			std::string getValue() const;
+			Token(T&& mType, const std::string& mValue) : type{mType}, value{mValue} { }
+			T getType() const { return type; }
+			std::string getValue() const { return value; }
 	};
 }
 

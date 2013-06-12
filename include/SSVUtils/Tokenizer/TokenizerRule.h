@@ -12,9 +12,9 @@ namespace ssvu
 {
 	class TokenizerRule
 	{
-		friend class Tokenizer;
 
-		private:
+
+		public:
 			bool isInitial(char mChar) const;
 			bool isValid(char mChar) const;
 			bool isKeyword(const std::vector<char>& mCurrentToken) const;

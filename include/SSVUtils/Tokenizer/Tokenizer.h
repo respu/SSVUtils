@@ -8,26 +8,56 @@
 #include <string>
 #include <vector>
 #include <functional>
+#include "SSVUtils/Tokenizer/Token.h"
 #include "SSVUtils/Tokenizer/TokenizerRule.h"
 
 namespace ssvu
 {
-	class Token;
-
-	class Tokenizer
+	template<typename T> class Tokenizer
 	{
+		public:
+			std::function<bool(char)> onIsIgnored;
+			std::function<T(const std::string&)> onMatchType;
+
 		private:
 			std::vector<TokenizerRule> rules;
 
-			void emitToken(std::vector<char>& mCurrentToken, std::vector<Token>& mTarget) const;
-			bool isIgnored(char mChar) const;
-			std::string matchType(const std::string& mValue) const;
+			bool isIgnored(char mChar) const { return onIsIgnored != nullptr && onIsIgnored(mChar); }
+			void emitToken(std::vector<char>& mCurrentToken, std::vector<Token<T>>& mTarget) const
+			{
+				if(mCurrentToken.empty()) return;
+
+				std::string value{std::begin(mCurrentToken), std::end(mCurrentToken)};
+				mTarget.push_back({onMatchType(value), value});
+				mCurrentToken.clear();
+			}
+			void computeToken(std::string::const_iterator& mIterator, std::vector<char>& mCurrentToken, std::vector<Token<T>>& mTarget) const
+			{
+				for(const auto& r : rules)
+				{
+					if(!r.isInitial(*mIterator)) continue;
+					for(; !isIgnored(*mIterator) && r.isValid(*mIterator) && !r.isKeyword(mCurrentToken); ++mIterator) mCurrentToken.push_back(*mIterator);
+
+					emitToken(mCurrentToken, mTarget);
+					--mIterator; return;
+				}
+			}
 
 		public:
-			std::function<bool(char)> onIsIgnored;
-			std::function<std::string(const std::string&)> onMatchType;
-			std::vector<Token> tokenize(const std::string& mString) const;
-			void addRule(const TokenizerRule& mRule);
+			std::vector<Token<T>> tokenize(const std::string& mString) const
+			{
+				std::vector<Token<T>> result;
+				std::vector<char> currentToken;
+
+				for(auto itr(std::begin(mString)); itr != std::end(mString); ++itr)
+				{
+					if(isIgnored(*itr)) emitToken(currentToken, result);
+					else computeToken(itr, currentToken, result);
+				}
+
+				return result;
+			}
+			void addRule(const TokenizerRule& mRule) { rules.push_back(mRule); }
 	};
 }
 

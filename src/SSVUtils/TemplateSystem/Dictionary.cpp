@@ -3,7 +3,6 @@
 // AFL License page: http://opensource.org/licenses/AFL-3.0
 
 #include "SSVUtils/TemplateSystem/Dictionary.h"
-#include "SSVUtils/TemplateSystem/Internal/Symbols.h"
 #include "SSVUtils/String/Utils.h"
 #include "SSVUtils/Tokenizer/Token.h"
 #include "SSVUtils/Log/Log.h"
@@ -57,8 +56,8 @@ namespace ssvu
 		}
 		void Dictionary::cleanUpUnexpanded(string& mString) const
 		{
-			vector<Token> tokens{tokenizer.tokenize("{{a[[sdga{{15dgaa{{1{")};
-			for(auto& t : tokens) log(t.getValue(), t.getType());
+			vector<Token<Internal::TokenType>> tokens{tokenizer.tokenize("{{a[[sdga{{15dgaa{{1{")};
+			for(auto& t : tokens) log(t.getValue(), toStr((int)t.getType()));
 		}
 
 		string Dictionary::getExpanded(string mString) const

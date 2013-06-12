@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include "SSVUtils/TemplateSystem/Internal/Symbols.h"
 #include "SSVUtils/Tokenizer/Tokenizer.h"
 
 namespace ssvu
@@ -24,7 +25,7 @@ namespace ssvu
 		class Dictionary
 		{
 			private:
-				Tokenizer tokenizer;
+				Tokenizer<Internal::TokenType> tokenizer;
 				std::map<std::string, std::string> replacements; /*!< Simple key -> string replacements. */
 				std::map<std::string, std::vector<Dictionary>> sectionDictionaries; /*!< Key -> subdictionary section replacements. */
 
